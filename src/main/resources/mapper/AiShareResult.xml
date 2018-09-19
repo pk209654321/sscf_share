@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sscf.share.dao.AiShareResultDao">
+
+	<select id="selectAiShareResultList" parameterType="com.sscf.share.dto.AiShareResultDto" resultType="com.sscf.share.entity.AiShareResult">
+		select 
+		share_scene,
+		app_channel,
+		share_creative,
+		superior_name,
+		sum(up_uv) up_uv,
+		sum(up_pv) up_pv,
+		first_persion,
+		share_channel,
+		sum(read_uv) read_uv,
+		sum(read_pv) read_pv,
+		sum(return_user) return_user,
+		sum(new_register_user) new_register_user
+		from ai_share_result 
+		where 1=1
+			<if test="start_time!=null and start_time!=''">
+				and insert_time &gt;= DATE_FORMAT(#{start_time},'%Y-%m-%d')
+			</if>
+			<if test="end_time!=null and end_time!=''">
+				and insert_time &lt;= DATE_FORMAT(#{end_time},'%Y-%m-%d')
+			</if>
+			<if test="share_channel!=null and share_channel!=''">
+				and share_channel=#{share_channel}
+			</if>
+			<if test="share_scene!=null and share_scene!=''">
+				and share_scene=#{share_scene}
+			</if>
+			<if test="recommend_id!=null">
+				and recommend_id=#{recommend_id}
+			</if>
+			group by  share_creative,share_scene,share_channel,first_persion,app_channel,superior_name
+		<if test="sortType!=null and sortType!='' and sortField!=null and sortField!=''">
+		order by ${sortField} sortType
+		</if>
+		<if test="rows != 0">
+			LIMIT #{offset}, #{rows}
+		</if>
+	</select>
+	
+	<select id="selectAiShareResultCount" parameterType="com.sscf.share.dto.AiShareResultDto" resultType="int">
+	select count(*) from (select id from ai_share_result
+		where 1=1
+			<if test="start_time!=null and start_time!=''">
+				and insert_time &gt;= DATE_FORMAT(#{start_time},'%Y-%m-%d')
+			</if>
+			<if test="end_time!=null and end_time!=''">
+				and insert_time &lt;= DATE_FORMAT(#{end_time},'%Y-%m-%d')
+			</if>
+			<if test="share_channel!=null and share_channel!=''">
+				and share_channel=#{share_channel}
+			</if>
+			<if test="share_scene!=null and share_scene!=''">
+				and share_scene=#{share_scene}
+			</if>
+			<if test="recommend_id!=null">
+				and recommend_id=#{recommend_id}
+			</if>
+			group by  share_creative,share_scene,share_channel,first_persion,app_channel,superior_name) t
+	</select>
+</mapper>
